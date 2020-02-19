@@ -18,6 +18,10 @@ node index.js
 
 ## 所爬网站http/https 修改代码中对应 http.get()/https.get()
 
+## list文件夹
+## dealErr.js文件 下载时会有失败的图片会统计到 list/image/errPages.txt 文件中, dealErr.js 会处理失败图片重新下载
+## guan.js/slamdunk.js 灌篮高手全国篇/灌篮高手
+## image/errPages.txt, image/errPages1.txt  (如果有失败会生成这些文件) 错误图片文件/二次错误图片文件
 
 
 ## 望大家支持正版！！
