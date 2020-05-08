@@ -70,7 +70,7 @@ function getPages(url, callback){
         res.on("end", function(){
             var $ = cheerio.load(imgData);
 
-            var list = $($('.chapteritem')[0]).find('li');          //查询dom方法
+            var list = $($('.detail-list-select')[0]).find('li');       //查询dom方法
             var json = {};
             var fileNameStr = '';
             $(list).each(function(k, v){
