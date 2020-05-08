@@ -9,12 +9,14 @@ const preUrl = 'https://www.manhuadui.com';
 const listUrl = 'https://www.manhuadui.com/manhua/dongjingshishigui/';
 const imgPreUrl = 'https://img01.eshanyao.com/';    //适用于1-15话  后续不用此前缀
 
+const start = 0;    //开始集数    0代表第1话
+const end = 145;      //结束集数
+
 //加密方法
 var CryptoJS = require('../crypto');
 
 getInfoList().then(function(list){
-  const start = 1;    //开始集数    0代表第1话
-  const end = 15;      //结束集数
+  fs.mkdir('./image', function(){});
 
   let k = start;
   download(k);
@@ -68,7 +70,13 @@ function getPageAndImg(info){
         
         let k = 1;
         let timer = setInterval(function(){
-          let imgUrl = midPreUrl + images[k-1];       //1-15话需要加上 imgPreUrl 前缀
+          let imgUrl = '';
+          //判断图片路径下载 拼接相应图片url
+          if(images[k-1].indexOf('https')!= -1){
+              imgUrl = midPreUrl + images[k-1];
+          }else{
+              imgUrl = imgPreUrl + midPreUrl + images[k-1];
+          }
           let name = '000' + k;
           if(k < 10){
             name = '00' + k;

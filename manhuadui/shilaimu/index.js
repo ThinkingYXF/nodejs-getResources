@@ -1,34 +1,35 @@
-//东京食尸鬼re
-//列表地址  https://www.manhuadui.com/manhua/dongjingshishiguire/
+//关于我转生为史莱姆这件事
+//列表地址  https://www.manhuadui.com/manhua/guanyuwozhuanshenghouchengweishilaimudenajianshi/
 
 var https =require('https');
 var fs = require('fs');
 var cheerio = require('cheerio');           //类似jquery
 
 const preUrl = 'https://www.manhuadui.com';
-const listUrl = 'https://www.manhuadui.com/manhua/dongjingshishiguire/';
-const imgPreUrl = 'https://img01.eshanyao.com/';
+const listUrl = 'https://www.manhuadui.com/manhua/guanyuwozhuanshenghouchengweishilaimudenajianshi/';
+const imgPreUrl = 'https://img01.eshanyao.com/';    //适用于55话以后  后续不用此前缀
 
 const start = 0;    //开始集数    0代表第1话
-const end = 180;    //结束集数
+const end = 71;     //结束集数
+
 
 //加密方法
 var CryptoJS = require('../crypto');
 
 getInfoList().then(function(list){
-  fs.mkdir('./image', function(){});
+    fs.mkdir('./image', function(){});
 
-  let k = start;
-  download(k);
-  //递归下载
-  function download(count){
-    getPageAndImg(list[count]).then(function(){
-      k++;
-      if(k < end){
-        download(k);
-      }
-    });
-  }
+    let k = start;
+    download(k);
+    //递归下载
+    function download(count){
+        getPageAndImg(list[count]).then(function(){
+        k++;
+        if(k < end){
+            download(k);
+        }
+        });
+    }
 });
 
 
@@ -57,48 +58,50 @@ function getPageAndImg(info){
     var count = 0;
     var url = preUrl + info.href + '?p=4';
     getUrlDom(url).then((obj)=>{
-      if(obj['domStr']){
-        let startStr = 'chapterImages = ';
-        let endStr = 'var chapterPath = ';
-        let start = obj['domStr'].indexOf(startStr);
-        let end = obj['domStr'].indexOf(endStr);
-        let str = obj['domStr'].substring(start + startStr.length + 1, end-2);  //images的加密文件
-        let images = dealImages(str); //每一集的所有图片的后缀集合
+        if(obj['domStr']){
+            let startStr = 'chapterImages = ';
+            let endStr = 'var chapterPath = ';
+            let start = obj['domStr'].indexOf(startStr);
+            let end = obj['domStr'].indexOf(endStr);
+            let str = obj['domStr'].substring(start + startStr.length + 1, end-2);  //images的加密文件
+            let images = dealImages(str); //每一集的所有图片的后缀集合
 
-        let end2 = obj['domStr'].indexOf('var chapterPrice');
-        let midPreUrl = obj['domStr'].substring(end + endStr.length + 1, end2 -2); //每一集的url前缀
-        
-        let k = 1;
-        let timer = setInterval(function(){
-          let imgUrl = '';
-          //判断图片路径下载 拼接相应图片url
-          if(images[k-1].indexOf('https')!= -1){
-              imgUrl = midPreUrl + images[k-1];
-          }else{
-              imgUrl = imgPreUrl + midPreUrl + images[k-1];
-          }
-          let name = '000' + k;
-          if(k < 10){
-            name = '00' + k;
-          }else if(k < 100){
-            name = '0' + k;
-          }
-          info.title = info.title.trim();
-          fs.mkdir('./image/' + info.title, function(){});
-          saveImg(imgUrl, info.title, name, function(){
-            count++;
-            if(count == images.length){
-              console.log(info.title + ' download success!!!!');
-              resolve();
-            }
-          });
+            let end2 = obj['domStr'].indexOf('var chapterPrice');
+            let midPreUrl = obj['domStr'].substring(end + endStr.length + 1, end2 -2); //每一集的url前缀
+            
+            let k = 1;
+            let timer = setInterval(function(){
+                let imgUrl = '';
+                //判断图片路径下载 拼接相应图片url
+                if(images[k-1].indexOf('https')!= -1){
+                    imgUrl = midPreUrl + images[k-1];
+                }else{
+                    imgUrl = imgPreUrl + midPreUrl + images[k-1];
+                }
+            
+                let name = '000' + k;
+                if(k < 10){
+                    name = '00' + k;
+                }else if(k < 100){
+                    name = '0' + k;
+                }
+                info.title = info.title.trim();
+                fs.mkdir('./image/' + info.title, function(){});
+                saveImg(imgUrl, info.title, name, function(){
+                    count++;
+                    console.log(count, images.length);
+                    if(count == images.length){
+                        console.log(info.title + ' download success!!!!');
+                        resolve();
+                    }
+                });
 
-          k++;
-          if(k > images.length){
-              clearInterval(timer);
-          }
-        }, 300);
-      }
+                k++;
+                if(k > images.length){
+                    clearInterval(timer);
+                }
+            }, 300);
+        }
     });
   });
 }
