@@ -1,16 +1,18 @@
+//灌篮高手，全国大赛   列表页  https://www.tohomh123.com/guanlangaoshouquanguodasaipianmanhua/
+
 var https =require('https');
-var http = require('http');
 var fs = require('fs');
 var cheerio = require('cheerio');           //类似jquery
 
-const imgStartUrl = 'https://mh2.zhengdongwuye.cn/upload/meishidefulu/';      //图片的前缀url
+// const imgStartUrl = 'https://mh1.zhengdongwuye.cn/upload/guanlangaoshouquanguodasaipianmanhua/';      //图片的前缀url
+const imgStartUrl = 'https://m-tohomh123-com.mipcdn.com/i/mh1.zhengdongwuye.cn/upload/guanlangaoshouquanguodasaipianmanhua/';      //图片的前缀url
 
 //建议开始时先测试下， 下载集数不要太多
 const partStart = 1;          //开始集数
-const partEnd = 5;            //结束集数
-const partInterval = 2000;      //每集下载时的间隔(避免并发大导致服务中断) 2000表示每2s下一集
+const partEnd = 55;            //结束集数
+const partInterval = 1000;      //每集下载时的间隔(避免并发大导致服务中断) 2000表示每2s下一集
 
-var wzUrl = 'https://www.tohomh123.com/meishidefulu/';      //列表页（网站分集列表页）
+var wzUrl = 'https://www.tohomh123.com/guanlangaoshouquanguodasaipianmanhua/';      //列表页（网站分集列表页）
 getPages(wzUrl, function(json){
     console.log('program start');
     var timer = '';
@@ -19,36 +21,14 @@ getPages(wzUrl, function(json){
         var fileName = json[count]['name'];                 //文件名
         fs.mkdir('./image/' + count, function(){});
         var nowjsPage = parseInt(json[count]['page']);
-
-        //修复1话中图片过多导致失败问题  更改为每 n ms下载一张图片
-        (function(count){
-            var k = 1;
-            var timer1 = setInterval(function(){
-                if(k < 10){
-                    k = '00' + k;
-                }else if(k < 100){
-                    k = '0' + k
-                }
-                let imgUrl = imgStartUrl + count + '/' + '0'+ k + '.jpg';
-                let imgName = k;
-                saveImg(imgUrl, count, imgName);
-    
-    
-                k++;
-                if(k > nowjsPage){
-                    clearInterval(timer1);
-                }
-            }, 200);
-        })(count);
-
-        // for(let k = 0; k < nowjsPage; k++){
-        //     if(k < 10){
-        //         k = '0' + k;
-        //     }
-        //     let imgUrl = imgStartUrl + count + '/' + '00'+ k + '.jpg';
-        //     let imgName = '00'+k;
-        //     saveImg(imgUrl, count, imgName);
-        // }
+        for(let k = 1; k < (nowjsPage+1); k++){
+            if(k < 10){
+                k = '0' + k;
+            }
+            let imgUrl = imgStartUrl + count + '/' + '00'+ k + '.jpg';
+            let imgName = '00'+k;
+            saveImg(imgUrl, count, imgName);
+        }
 
         count++;
         if(count > partEnd){
@@ -92,7 +72,7 @@ function getPages(url, callback){
         res.on("end", function(){
             var $ = cheerio.load(imgData);
 
-            var list = $($('.detail-list-select')[0]).find('li');       //查询dom方法
+            var list = $($('.detail-list-select')[0]).find('li');;          //查询dom方法
             var json = {};
             var fileNameStr = '';
             $(list).each(function(k, v){
@@ -104,7 +84,7 @@ function getPages(url, callback){
 
                 var spanHtml = $(v).find('a').find('span').text();
                 var page =  spanHtml.substr((spanHtml.indexOf('（') + 1), spanHtml.indexOf('P') - 1); //页数
-                json[nowjs-1] = {
+                json[nowjs] = {
                     page: page,
                     name: name
                 };
