@@ -18,7 +18,26 @@ var getResource = {
     this.getInfoList().then(function(list){
       fs.mkdir('./image', function(){});
       let k = that.startJS;
-      download(k);
+      
+      judgeDown(k);
+      //判断是否存在文件夹 若存在则下载
+      function judgeDown(js){
+        var nowDownloadJS = list[js].title;
+        fs.exists('./image/' + nowDownloadJS, function(result){
+          if(!result){
+            if(js > 1){
+              k = k-1;
+              download(js-1);
+            }else{
+              download(js);
+            }
+          }else{
+            k++;
+            judgeDown(k);
+          }
+        });
+      }
+
       //递归下载
       function download(count){
         that.getPageAndImg(list[count]).then(function(){
@@ -73,13 +92,13 @@ var getResource = {
   
               let end2 = obj['domStr'].indexOf('var chapterPrice');
               let midPreUrl = obj['domStr'].substring(end + endStr.length + 1, end2 -2); //每一集的url前缀
-              
               let k = 1;
               let timer = setInterval(function(){
                   let imgUrl = '';
                   //判断图片路径下载 拼接相应图片url
                   if(images[k-1].indexOf('https')!= -1){
-                      imgUrl = midPreUrl + images[k-1];
+                      // imgUrl = midPreUrl + images[k-1];
+                      imgUrl = images[k-1];
                   }else{
                       imgUrl = that.imgPreUrl + midPreUrl + images[k-1];
                   }
@@ -94,7 +113,7 @@ var getResource = {
                   fs.mkdir('./image/' + info.title, function(){});
                   that.saveImg(imgUrl, info.title, name, function(){
                       count++;
-                      console.log(count, images.length);
+                      console.log(count, images.length, name);
                       if(count == images.length){
                           console.log(info.title + ' download success!!!!');
                           resolve();
