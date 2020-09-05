@@ -23,6 +23,7 @@ var getResource = {
       //判断是否存在文件夹 若存在则下载
       function judgeDown(js){
         var nowDownloadJS = list[js].title;
+        nowDownloadJS = nowDownloadJS.replace('?', '？');
         fs.exists('./image/' + nowDownloadJS, function(result){
           if(!result){
             if(js > 1){
@@ -110,15 +111,27 @@ var getResource = {
                       name = '0' + k;
                   }
                   info.title = info.title.trim();
-                  fs.mkdir('./image/' + info.title, function(){});
-                  that.saveImg(imgUrl, info.title, name, function(){
+                  info.title = info.title.replace('?', '？');
+
+                  fs.exists('./image/' + info.title, function(result){
+                    if(!result){
+                      fs.mkdir('./image/' + info.title, function(){});
+                    }
+
+                    that.saveImg(imgUrl, info.title, name, function(){
                       count++;
                       console.log(count, images.length, name);
                       if(count == images.length){
                           console.log(info.title + ' download success!!!!');
                           resolve();
                       }
+                    });
+
                   });
+
+
+                  // fs.mkdir('./image/' + info.title, function(){});
+                  
   
                   k++;
                   if(k > images.length){
