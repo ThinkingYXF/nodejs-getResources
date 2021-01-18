@@ -2,7 +2,7 @@ var https = require('https');
 var fs = require('fs');
 var cheerio = require('cheerio');           //类似jquery
 
-const listUrl = "https://www.linovelib.com/novel/2631/catalog";
+const listUrl = "https://www.linovelib.com/novel/2878/catalog";
 const preUrl = "https://www.linovelib.com";
 
 var getResources = {
@@ -11,7 +11,7 @@ var getResources = {
     this.getJSList(listUrl).then(JSList => {
       fs.mkdir('./image', function () { });
       var totalLength = JSList.length;
-      var count = 106;
+      var count = 0;
 
       var that = this;
       function download() {

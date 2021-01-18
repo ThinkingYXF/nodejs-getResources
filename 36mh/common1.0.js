@@ -7,6 +7,7 @@ var getResources = {
   preUrl: "https://www.36mh.net/",
   imgUrl: "https://img001.shmkks.com/",
   timestamp: 300,   //每隔  300ms下载一张图片
+  timeEvery: 2000,  //每集之间间隔 n 秒下载 防止报错停止进程
   init: function () {
     //得到集数与名称
     this.getJSList(this.listUrl).then(JSList => {
@@ -101,7 +102,9 @@ var getResources = {
             console.log(count, imgUrlList.length, key);
             if (count == imgUrlList.length) {
               console.log(info.title + ' download success!!!!');
-              resolve();
+              setTimeout(() => {
+                resolve();
+              }, that.timeEvery);
             }
           });
 

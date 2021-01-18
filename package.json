@@ -11,6 +11,7 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
     "request": "^2.88.0",
-    "superagent": "^6.1.0"
+    "superagent": "^6.1.0",
+    "superagent-charset": "^1.2.0"
   }
 }
