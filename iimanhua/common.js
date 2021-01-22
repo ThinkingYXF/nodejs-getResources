@@ -8,7 +8,7 @@ var decode = require("./decode");
 
 var getResources = {
   listUrl: "https://www.iimanhua.com/comic/428/",   //漫画列表页
-  preUrl: "https://www.iimanhua.com/",              //漫画详情页前缀
+  preUrl: "http://www.iimanhua.com/",              //漫画详情页前缀
   imgPreUrl: "http://res.img.jituoli.com/",         //图片url前缀
   timestamp: 500,   //每个 n 毫秒下载一张图
   init: function () {
