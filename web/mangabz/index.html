@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.3/css/bootstrap.min.css" rel="stylesheet">
+  <title>MANGABZ IMG</title>
+  <style>
+    body {
+      padding: 20px;
+    }
+
+    .input-group {
+      width: 600px;
+    }
+
+    .chapterContent ul {
+      overflow: hidden;
+      margin-top: 20px;
+    }
+
+    .chapterContent ul li {
+      float: left;
+      list-style: none;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      padding: 5px 10px;
+      background: #eee;
+      min-width: 120px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .chapterContent ul li:hover {
+      background: palegreen;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="content">
+    <p>例如：http://mangabz.com/139bz/ （海贼王）</p>
+    <div class="input-group">
+      <input type="text" class="form-control listInput" placeholder="输入/139bz/即可">
+      <span class="input-group-btn">
+        <button class="btn btn-primary searchInfo" type="button">查询</button>
+      </span>
+    </div>
+    <div class="chapterContent">
+      <ul></ul>
+    </div>
+  </div>
+
+  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.1/jquery.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.5.3/js/bootstrap.min.js"></script>
+  <script src="../util.js"></script>
+  <script>
+    const PREURL = "http://localhost:8088/abz";
+    $(document).ready(function () {
+      //查询
+      $(".searchInfo").click(function () {
+        var listUrl = $(".listInput").val();
+        if (listUrl) {
+          myAjax(PREURL + listUrl).then(function (res) {
+            res = unescape(res);
+            var list = $(res).find("#chapterlistload a");
+            $(".chapterContent ul").empty();
+
+            $(list).each(function (k) {
+              let reveseIdx = list.length - k - 1;
+              var title = $(list).eq(reveseIdx).text().replace(/ /g, "");
+              var text = '(' + k + ')' + title;
+              var href = $(list).eq(reveseIdx).prop("href");
+              var domLi = $("<li />").text(text).attr("href", href);
+              $(".chapterContent ul").append(domLi);
+            })
+          });
+        }
+      });
+      //点击每一章
+      $(".chapterContent").on("click", "li", function () {
+        var url = $(this).attr("href");
+        myAjax(url, null, {
+          host: "http://mangabz.com",
+        }).then(function (res) {
+          var p = getValueWithKey(res, "packed=");
+          var photosr = new Array();    //每一章的图片url list
+          eval(eval(base64decode(p).slice(4)));
+          photosr.splice(0, 1);   //删除掉第一个空值
+          var imgList = photosr.map(item => {
+            return PREURL + "/" + item;
+          });
+          batchOption(imgList);
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>

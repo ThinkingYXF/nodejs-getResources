@@ -9,14 +9,15 @@ var decode = require("./decode");
 var getResources = {
   listUrl: "https://www.iimanhua.com/comic/428/",   //漫画列表页
   preUrl: "http://www.iimanhua.com/",              //漫画详情页前缀
-  imgPreUrl: "http://res.img.jituoli.com/",         //图片url前缀
+  // imgPreUrl: "http://res.img.jituoli.com/",         //图片url前缀
+  imgPreUrl: "http://res.img.youzipi.net/",         //图片url前缀
   timestamp: 500,   //每个 n 毫秒下载一张图
   init: function () {
     //得到集数与名称
     this.getJSList(this.listUrl).then(JSList => {
       fs.mkdir('./image', function () { });
       var totalLength = JSList.length;
-      var count = 0;
+      var count = 3;
 
       var that = this;
       function download() {
@@ -60,6 +61,7 @@ var getResources = {
         let result = res['domStr'].substring(startIdx + 8, endIdx - 1);
         var photosr = new Array();
         eval(eval(decode(result).slice(4)));
+        photosr.splice(0, 1); //去掉第一个空值
         resolve(photosr);
       });
     })
