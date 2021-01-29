@@ -5,6 +5,7 @@ var request = charset(superagent);
 var fs = require('fs');
 var cheerio = require('cheerio');           //类似jquery
 var decode = require("./decode");
+var Common = require("../util");
 
 var getResources = {
   listUrl: "https://www.iimanhua.com/comic/428/",   //漫画列表页
@@ -17,7 +18,7 @@ var getResources = {
     this.getJSList(this.listUrl).then(JSList => {
       fs.mkdir('./image', function () { });
       var totalLength = JSList.length;
-      var count = 3;
+      var count = 0;
 
       var that = this;
       function download() {
@@ -55,7 +56,6 @@ var getResources = {
     var that = this;
     return new Promise(function (resolve) {
       that.getUrlDom(url).then(res => {
-
         let startIdx = res['domStr'].indexOf('packed=');
         let endIdx = res['domStr'].indexOf(';eval(eval(base64decode');
         let result = res['domStr'].substring(startIdx + 8, endIdx - 1);
@@ -75,8 +75,9 @@ var getResources = {
         for (let i = 0; i < list.length; i++) {
           let reveseIdx = list.length - i - 1;
           var href = res['$'](list).eq(reveseIdx).find('a').prop('href');
+          var title = '(' + i + ')' + res['$'](list).eq(reveseIdx).find('a').text();
           let info = {
-            title: '(' + i + ')' + res['$'](list).eq(reveseIdx).find('a').text(),
+            title: Common.replaceSpecialChar(title),
             href: that.preUrl + href
           }
           jishuList.push(info);
@@ -108,8 +109,6 @@ var getResources = {
               }
             });
           }
-
-
           k++;
           if (k == imgUrlList.length) {
             clearInterval(timer);

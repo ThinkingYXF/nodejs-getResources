@@ -4,6 +4,7 @@ var superagent = require('superagent');
 var request = charset(superagent);
 var fs = require('fs');
 var cheerio = require('cheerio');           //类似jquery
+var Common = require("../util");
 
 var getResources = {
   listUrl: "http://mangabz.com/207bz/",   //漫画列表页
@@ -159,8 +160,9 @@ var getResources = {
         for (let i = 0; i < list.length; i++) {
           let reveseIdx = list.length - i - 1;
           var href = res['$'](list).eq(reveseIdx).prop('href');
+          var title = '(' + i + ')' + res['$'](list).eq(reveseIdx).text();
           let info = {
-            title: '(' + i + ')' + res['$'](list).eq(reveseIdx).text().replace(/ /g, ""),
+            title: Common.replaceSpecialChar(title),
             href: that.preUrl + href
           }
           jishuList.push(info);

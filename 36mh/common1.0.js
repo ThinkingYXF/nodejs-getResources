@@ -1,6 +1,7 @@
 var https = require('https');
 var fs = require('fs');
 var cheerio = require('cheerio');           //类似jquery
+const Common = require('../util');
 let midPath = '';
 var getResources = {
   listUrl: "",
@@ -74,8 +75,9 @@ var getResources = {
         let jishuList = [];
         for (let i = 0; i < list.length; i++) {
           var href = res['$'](list).eq(i).find('a').prop('href');
+          var title = '(' + i + ')' + res['$'](list).eq(i).find('a').text();
           let info = {
-            title: '(' + i + ')' + res['$'](list).eq(i).find('a').text().trim(),
+            title: Common.replaceSpecialChar(title),
             href: that.preUrl + href
           }
           jishuList.push(info);

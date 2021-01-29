@@ -1,6 +1,7 @@
 var https = require('https');
 var fs = require('fs');
 var cheerio = require('cheerio');           //类似jquery
+var Common = require("../util");
 
 const listUrl = "https://www.linovelib.com/novel/2878/catalog";
 const preUrl = "https://www.linovelib.com";
@@ -72,8 +73,9 @@ var getResources = {
         let jishuList = [];
         for (let i = 0; i < list.length; i++) {
           var href = res['$'](list).eq(i).find('a').prop('href');
+          var title = '(' + i + ')' + res['$'](list).eq(i).find('a').text();
           let info = {
-            title: '(' + i + ')' + res['$'](list).eq(i).find('a').text(),
+            title: Common.replaceSpecialChar(title),
             href: preUrl + href
           }
           jishuList.push(info);
