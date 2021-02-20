@@ -2,6 +2,7 @@ var https = require('https');
 var superagent = require("superagent");
 var fs = require('fs');
 var cheerio = require('cheerio');           //类似jquery
+var Common = require("../util");
 
 //加密方法
 var getImgList = require('./decrypt20200824');    //调用 getImgList(str);
@@ -9,7 +10,7 @@ var getImgList = require('./decrypt20200824');    //调用 getImgList(str);
 
 var getResource = {
   preStartUrl: 'https://www.manhuadui.com',       //查看某一话的前缀url
-  imgPreUrl: 'https://manga.mipcdn.com/i/s/img01.eshanyao.com/',       //某些图片需要加此前缀
+  imgPreUrl: 'https://pic.w1fl.com',       //某些图片需要加此前缀
 
   listUrl: 'https://www.manhuadui.com/manhua/',  //漫画列表页
   startJS: 0,       //开始集数    0代表第一话
@@ -24,19 +25,17 @@ var getResource = {
       //判断是否存在文件夹 若存在则下载
       function judgeDown(js) {
         var nowDownloadJS = list[js].title;
-        fs.exists('./image/' + nowDownloadJS, function (result) {
-          if (!result) {
-            if (js > 1) {
-              k = k - 1;
-              download(js - 1);
-            } else {
-              download(js);
-            }
+        if (!fs.existsSync('./image/' + nowDownloadJS)) {
+          if (js > 1) {
+            k = k - 1;
+            download(js - 1);
           } else {
-            k++;
-            judgeDown(k);
+            download(js);
           }
-        });
+        } else {
+          k++;
+          judgeDown(k);
+        }
       }
       //递归下载
       function download(count) {
@@ -61,9 +60,11 @@ var getResource = {
         var list = obj['$']('.zj_list_con').find('ul li');
         let jishuList = [];
         for (let i = 0; i < list.length; i++) {
+          var href = obj['$'](list).eq(i).find('a').prop('href');
+          var title = '(' + i + ')' + obj['$'](list).eq(i).find('span.list_con_zj').text();
           let info = {
-            title: obj['$'](list).eq(i).find('span.list_con_zj').text(),
-            href: obj['$'](list).eq(i).find('a').prop('href')
+            title: Common.replaceSpecialChar(title),
+            href: href
           }
           jishuList.push(info);
         }
@@ -87,21 +88,18 @@ var getResource = {
           let endStr = 'var chapterPath = ';
           let start = obj['domStr'].indexOf(startStr);
           let end = obj['domStr'].indexOf(endStr);
-          let str = obj['domStr'].substring(start + startStr.length + 1, end - 2);  //images的加密文件
-          let images = getImgList(str); //每一集的所有图片的后缀集合
-
-          let end2 = obj['domStr'].indexOf('var chapterPrice');
-          let midPreUrl = obj['domStr'].substring(end + endStr.length + 1, end2 - 2); //每一集的url前缀
+          let str = obj['domStr'].substring(start + startStr.length, end - 1);  //images的加密文件
+          // let images = getImgList(str); //每一集的所有图片的后缀集合
+          let images = JSON.parse(str); //每一集的所有图片的后缀集合
 
           let k = 1;
           let timer = setInterval(function () {
             let imgUrl = '';
             //判断图片路径下载 拼接相应图片url
             if (images[k - 1].indexOf('https') != -1) {
-              // imgUrl = midPreUrl + images[k-1];
               imgUrl = images[k - 1];
             } else {
-              imgUrl = that.imgPreUrl + midPreUrl + images[k - 1];
+              imgUrl = that.imgPreUrl + images[k - 1];
             }
 
             let name = '000' + k;
@@ -109,6 +107,8 @@ var getResource = {
               name = '00' + k;
             } else if (k < 100) {
               name = '0' + k;
+            } else {
+              name = k;
             }
             info.title = info.title.trim();
             fs.mkdir('./image/' + info.title, function () { });

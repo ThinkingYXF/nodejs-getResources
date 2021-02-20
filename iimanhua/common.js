@@ -103,7 +103,7 @@ var getResources = {
             that.saveImg(imgUrlList[k], info.title, key, function () {
               count++;
               console.log(count, imgUrlList.length, key);
-              if (count == imgUrlList.length - 1) {
+              if (count == imgUrlList.length) {
                 console.log(info.title + ' download success!!!!');
                 resolve();
               }

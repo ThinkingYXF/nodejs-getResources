@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All</title>
+  <style>
+    .content {
+      color: #666;
+      font-size: 13px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .content h3 {
+      font-size: 20px;
+      background: #f1f1f1;
+      padding: 10px;
+    }
+
+    .content h3 span {
+      float: right;
+    }
+
+    .content ul {
+      overflow: hidden;
+    }
+
+    .content ul li {
+      list-style: none;
+      float: left;
+      width: 220px;
+      line-height: 25px;
+      margin-right: 20px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    a {
+      color: #666;
+      text-decoration: none;
+    }
+
+    .content ul li a.red {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="content"></div>
+  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.1/jquery.js"></script>
+  <script src="../util.js"></script>
+  <script>
+    const listUrl = "http://www.iimanhua.com/manhua/lianzai.html";
+    const LISTURL = "http://localhost:8088/manhua/lianzai.html";
+    $(document).ready(function () {
+      myAjax(LISTURL, "gb2312").then(function (res) {
+        var a = document.querySelector(".allList");
+        console.log(res);
+        var content = $(res).find(".allList").html();
+        $(".content").html(content);
+      });
+    });
+  </script>
+</body>
+
+</html>

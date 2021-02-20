@@ -6,7 +6,7 @@ let midPath = '';
 var getResources = {
   listUrl: "",
   preUrl: "https://www.36mh.net/",
-  imgUrl: "https://img001.shmkks.com/",
+  imgUrl: "http://img001.microland-design.com/",
   timestamp: 300,   //每隔  300ms下载一张图片
   timeEvery: 2000,  //每集之间间隔 n 秒下载 防止报错停止进程
   init: function () {
@@ -91,6 +91,7 @@ var getResources = {
     return new Promise(function (resolve) {
       var count = 0;
       that.getImgUrlList(info.href).then(imgUrlList => {
+        console.log(imgUrlList);
         let k = 0;
         let timer = setInterval(function () {
           info.title = info.title.trim();
