@@ -5,8 +5,8 @@ const Common = require('../util');
 let midPath = '';
 var getResources = {
   listUrl: "",
-  preUrl: "https://www.36mh.net/",
-  imgUrl: "http://img001.microland-design.com/",
+  preUrl: "https://www.77mh.nl",
+  imgUrl: "https://picsh.77dm.top/",
   timestamp: 300,   //每隔  300ms下载一张图片
   timeEvery: 2000,  //每集之间间隔 n 秒下载 防止报错停止进程
   init: function () {
@@ -14,7 +14,7 @@ var getResources = {
     this.getJSList(this.listUrl).then(JSList => {
       fs.mkdir('./image', function () { });
       var totalLength = JSList.length;
-      var count = 0;
+      var count = 60;
 
       var that = this;
       function download() {
@@ -57,13 +57,16 @@ var getResources = {
     var that = this;
     return new Promise(function (resolve) {
       that.getUrlDom(url).then(res => {
-        let startIdx = res['domStr'].indexOf('chapterImages = ');
-        let endIdx = res['domStr'].indexOf(';var chapterPath');
-        let result = res['domStr'].substring(startIdx + 16, endIdx);
-        let startIdx1 = res['domStr'].indexOf('chapterPath = "');
-        let endIdx1 = res['domStr'].indexOf('";var chapterPrice');
-        midPath = res['domStr'].substring(startIdx1 + 15, endIdx1);
-        resolve(JSON.parse(result));
+        let startIdx = res['domStr'].indexOf('eval');
+        let endIdx = res['domStr'].indexOf('</script></div><div id="jsindivstar"');
+        let result = res['domStr'].substring(startIdx, endIdx);
+        eval(result);
+        let imgArr = []
+        if (msg) {
+          imgArr = msg.split("|");
+        }
+        imgArr = imgArr.map(v => 'h' + img_s + '/' + v);
+        resolve(imgArr);
       });
     })
   },
@@ -71,17 +74,18 @@ var getResources = {
     var that = this;
     return new Promise(function (resolve) {
       that.getUrlDom(url).then(res => {
-        var list = res['$']('ul#chapter-list-4').find('li');
+        var list = res['$']('.ar_rlos_bor.ar_list_col').find('li');
         let jishuList = [];
         for (let i = 0; i < list.length; i++) {
           var href = res['$'](list).eq(i).find('a').prop('href');
-          var title = '(' + i + ')' + res['$'](list).eq(i).find('a').text();
+          var title = '(' + (list.length - i) + ')' + res['$'](list).eq(i).find('a').text();
           let info = {
             title: Common.replaceSpecialChar(title),
             href: that.preUrl + href
           }
           jishuList.push(info);
         }
+        jishuList = jishuList.reverse();
         resolve(jishuList);
       })
     });
@@ -91,15 +95,14 @@ var getResources = {
     return new Promise(function (resolve) {
       var count = 0;
       that.getImgUrlList(info.href).then(imgUrlList => {
-        console.log(imgUrlList);
         let k = 0;
         let timer = setInterval(function () {
           info.title = info.title.trim();
           fs.mkdir('./image/' + info.title, function () { });
           var key = k < 9 ? ('00' + (k + 1)) : ('0' + (k + 1));
-          if (imgUrlList[k].indexOf('http') == -1) {
-            imgUrlList[k] = that.imgUrl + midPath + imgUrlList[k];
-          }
+          // if (imgUrlList[k].indexOf('http') == -1) {
+          imgUrlList[k] = that.imgUrl + imgUrlList[k];
+          // }
           that.saveImg(imgUrlList[k], info.title, key, function () {
             count++;
             console.log(count, imgUrlList.length, key);
