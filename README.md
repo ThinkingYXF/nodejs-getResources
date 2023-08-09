@@ -1,4 +1,4 @@
-## 36mh文件夹         https://www.36mh.com/ 36漫画网中资源
+## 77mh文件夹         https://www.77mh.nl/      新新漫画中资源
 ## bili文件夹         https://www.linovelib.com 哔哩轻小说中资源
 ## list文件夹         https://www.tohomh123.com 土豪漫画中资源
 ## manhuadai文件夹    https://www.manhuadui.com 漫画堆中资源
