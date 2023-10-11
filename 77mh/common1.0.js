@@ -9,12 +9,13 @@ var getResources = {
   imgUrl: "https://picsh.77dm.top/",
   timestamp: 300,   //每隔  300ms下载一张图片
   timeEvery: 2000,  //每集之间间隔 n 秒下载 防止报错停止进程
+  timeout: 10000,  //超时时间，超过 n 秒 重新下载
   init: function () {
     //得到集数与名称
     this.getJSList(this.listUrl).then(JSList => {
       fs.mkdir('./image', function () { });
       var totalLength = JSList.length;
-      var count = 60;
+      var count = 0;
 
       var that = this;
       function download() {
@@ -94,6 +95,7 @@ var getResources = {
     var that = this;
     return new Promise(function (resolve) {
       var count = 0;
+      const timeObj = {};
       that.getImgUrlList(info.href).then(imgUrlList => {
         let k = 0;
         let timer = setInterval(function () {
@@ -103,16 +105,40 @@ var getResources = {
           // if (imgUrlList[k].indexOf('http') == -1) {
           imgUrlList[k] = that.imgUrl + imgUrlList[k];
           // }
-          that.saveImg(imgUrlList[k], info.title, key, function () {
-            count++;
-            console.log(count, imgUrlList.length, key);
-            if (count == imgUrlList.length) {
-              console.log(info.title + ' download success!!!!');
-              setTimeout(() => {
-                resolve();
-              }, that.timeEvery);
-            }
-          });
+          timeObj[k] = { startTime: Date.now(), endTime: "" };
+          (function (k) {
+            that.saveImg(imgUrlList[k], info.title, key, function () {
+              timeObj[k].endTime = Date.now();
+              count++;
+              console.log(count, imgUrlList.length, key);
+              if (count == imgUrlList.length) {
+                console.log(info.title + ' ---- download success ----');
+                setTimeout(() => {
+                  resolve();
+                }, that.timeEvery);
+              }
+            });
+          })(k);
+
+
+          (function (k) {
+            setTimeout(function () {
+              //n秒内还未响应
+              if (!timeObj[k].endTime) {
+                that.saveImg(imgUrlList[k], info.title, key, function () {
+                  timeObj[k].endTime = Date.now();
+                  count++;
+                  console.log(count, imgUrlList.length, key, '==== re donwload ====');
+                  if (count == imgUrlList.length) {
+                    console.log(info.title + ' ---- re download success ----');
+                    setTimeout(() => {
+                      resolve();
+                    }, that.timeEvery);
+                  }
+                });
+              }
+            }, that.timeout);
+          })(k);
 
           k++;
           if (k == imgUrlList.length) {
